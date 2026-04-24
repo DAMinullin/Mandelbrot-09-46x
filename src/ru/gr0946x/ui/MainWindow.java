@@ -6,11 +6,18 @@ import ru.gr0946x.ui.fractals.Mandelbrot;
 import ru.gr0946x.ui.painting.FractalPainter;
 import ru.gr0946x.ui.painting.Painter;
 import ru.gr0946x.model.FractalState;
+
+import java.io.File;
 import java.util.Stack;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.ObjectOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import static java.lang.Math.*;
 
@@ -74,7 +81,40 @@ public class MainWindow extends JFrame {
                 .addGap(8)
         );
     }
+    private void saveFractalFile() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Сохранить фрактал");
+        chooser.setFileFilter(new FileNameExtensionFilter("Файлы фрактала (*.frac)", "frac"));
 
+        if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File file = chooser.getSelectedFile();
+            String path = file.getAbsolutePath();
+
+            if (!path.toLowerCase().endsWith(".frac")) {
+                file = new File(path + ".frac");
+            }
+
+            if (file.exists()) {
+                int result = JOptionPane.showConfirmDialog(this,
+                        "Файл уже существует. Перезаписать?",
+                        "Подтверждение",
+                        JOptionPane.YES_NO_OPTION);
+                if (result != JOptionPane.YES_OPTION) return;
+            }
+
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+                FractalState state = new FractalState(
+                        conv.getXMin(), conv.getXMax(),
+                        conv.getYMin(), conv.getYMax(),
+                        painter.getWidth(), painter.getHeight()
+                );
+                oos.writeObject(state);
+                JOptionPane.showMessageDialog(this, "Фрактал сохранён!");
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "Ошибка сохранения: " + ex.getMessage());
+            }
+        }
+    }
     // ==================== МЕТОДЫ ДЛЯ ОТМЕНЫ ДЕЙСТВИЙ (UNDO/REDO) ====================
 
     private void saveCurrentStateToUndo() {
