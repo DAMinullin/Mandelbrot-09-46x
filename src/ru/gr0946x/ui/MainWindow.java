@@ -1,6 +1,7 @@
 package ru.gr0946x.ui;
 
 import ru.gr0946x.Converter;
+import ru.gr0946x.ui.fractals.ColorScheme;
 import ru.gr0946x.ui.fractals.Fractal;
 import ru.gr0946x.ui.fractals.Mandelbrot;
 import ru.gr0946x.ui.painting.FractalPainter;
@@ -11,7 +12,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import static java.lang.Math.*;
 
 public class MainWindow extends JFrame {
@@ -21,21 +21,28 @@ public class MainWindow extends JFrame {
     private final Fractal mandelbrot;
     private final Converter conv;
 
-    public MainWindow(){
+    private static class DefaultColorScheme implements ColorScheme {
+        @Override
+        public Color getColor(float value) {
+            if (value == 1.0) return Color.BLACK;
+            float r = (float) Math.abs(Math.sin(5 * value));
+            float g = (float) Math.abs(Math.cos(8 * value) * Math.sin(3 * value));
+            float b = (float) Math.abs((Math.sin(7 * value) + Math.cos(15 * value)) / 2);
+            return new Color(r, g, b);
+        }
+    }
+
+    public MainWindow() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(800, 650));
         mandelbrot = new Mandelbrot();
         conv = new Converter(-2.0, 1.0, -1.0, 1.0);
-        painter = new FractalPainter(mandelbrot, conv, (value)->{
-            if (value == 1.0) return Color.BLACK;
-            var r = (float)abs(sin(5 * value));
-            var g = (float)abs(cos(8 * value) * sin(3 * value));
-            var b = (float)abs((sin(7 * value) + cos(15 * value)) / 2f);
-            return new Color(r, g, b);
-        });
+
+        painter = new FractalPainter(mandelbrot, conv, new DefaultColorScheme());
+
         mainPanel = new SelectablePanel(painter, conv);
         mainPanel.setBackground(Color.WHITE);
-        mainPanel.addSelectListener((r)->{
+        mainPanel.addSelectListener((r) -> {
             var xMin = conv.xScr2Crt(r.x);
             var xMax = conv.xScr2Crt(r.x + r.width);
             var yMin = conv.yScr2Crt(r.y + r.height);
@@ -174,7 +181,7 @@ public class MainWindow extends JFrame {
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private void setContent(){
+    private void setContent() {
         var gl = new GroupLayout(getContentPane());
         setLayout(gl);
         gl.setVerticalGroup(gl.createSequentialGroup()
