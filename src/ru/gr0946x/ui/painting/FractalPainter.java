@@ -1,7 +1,7 @@
 package ru.gr0946x.ui.painting;
 
 import ru.gr0946x.Converter;
-import ru.gr0946x.ui.fractals.ColorFunction;
+import ru.gr0946x.ui.fractals.ColorScheme;
 import ru.gr0946x.ui.fractals.Fractal;
 
 import java.awt.*;
@@ -14,12 +14,12 @@ public class FractalPainter implements Painter {
 
     private final Fractal fractal;
     private final Converter conv;
-    private final ColorFunction colorFunction;
+    private final ColorScheme colorScheme;
 
-    public FractalPainter(Fractal f, Converter conv, ColorFunction cf) {
+    public FractalPainter(Fractal f, Converter conv, ColorScheme colorScheme) {
         this.fractal = f;
         this.conv = conv;
-        this.colorFunction = cf;
+        this.colorScheme = colorScheme;
     }
 
     @Override
@@ -65,7 +65,7 @@ public class FractalPainter implements Painter {
                         double cr = conv.xScr2Crt(x);
                         double ci = conv.yScr2Crt(y);
                         float value = fractal.inSetProbability(cr, ci);
-                        Color color = colorFunction.getColor(value);
+                        Color color = colorScheme.getColor(value);
                         image.setRGB(x, y, color.getRGB());
                     }
                 }
