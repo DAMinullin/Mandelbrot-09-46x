@@ -65,7 +65,7 @@ public class MainWindow extends JFrame {
         // Сохраняем начальное состояние для отмены действий
         saveCurrentStateToUndo();
         setContent();
-
+        setupMenuBar();
         // Настройка горячих клавиш для отмены/повтора
         setupUndoRedoShortcuts();
     }
@@ -241,5 +241,29 @@ public class MainWindow extends JFrame {
                 redo();
             }
         });
+    }
+    // ==================== ГЛАВНОЕ МЕНЮ ====================
+
+    private void setupMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+
+        JMenu fileMenu = new JMenu("Файл");
+
+        JMenuItem openItem = new JMenuItem("Открыть .frac...");
+        openItem.addActionListener(e -> openFractalFile());
+        fileMenu.add(openItem);
+
+        JMenuItem saveItem = new JMenuItem("Сохранить как .frac...");
+        saveItem.addActionListener(e -> saveFractalFile());
+        fileMenu.add(saveItem);
+
+        fileMenu.addSeparator();
+
+        JMenuItem exitItem = new JMenuItem("Выход");
+        exitItem.addActionListener(e -> System.exit(0));
+        fileMenu.add(exitItem);
+
+        menuBar.add(fileMenu);
+        setJMenuBar(menuBar);
     }
 }
